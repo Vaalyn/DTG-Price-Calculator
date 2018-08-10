@@ -1,6 +1,7 @@
 {
     "name": "vaalyn/dtg-price-calculator",
     "type": "library",
+	"license": "Apache-2.0",
     "authors": [
         {
             "name": "Vaalyn",
