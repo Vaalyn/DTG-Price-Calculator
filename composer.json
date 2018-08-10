@@ -1,0 +1,18 @@
+{
+    "name": "vaalyn/dtg-price-calculator",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Vaalyn",
+            "email": "vaalyndev@gmail.com"
+        }
+    ],
+	"autoload": {
+		"psr-4": {
+			"Vaalyn\\DtgPriceCalculator\\": "src"
+		}
+	},
+    "require": {
+        "ext-bcmath": "^7.1"
+    }
+}
