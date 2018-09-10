@@ -14,6 +14,6 @@
 		}
 	},
     "require": {
-        "ext-bcmath": "^7.1"
+        "moneyphp/money": "^3.1"
     }
 }

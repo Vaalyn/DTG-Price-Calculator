@@ -4,116 +4,118 @@ declare(strict_types = 1);
 
 namespace Vaalyn\DtgPriceCalculator;
 
+use Money\Money;
+
 interface DtgPriceInterface {
 	/**
-	 * Returns the ink cost in the smallest denominator of your currency
+	 * Returns the ink cost as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getInkCost(): string;
+	public function getInkCost(): Money;
 
 	/**
-	 * Sets the ink cost in the smalles denominator of your currency
+	 * Sets the ink cost as money object
 	 *
-	 * @param string $inkCost
+	 * @param Money $inkCost
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setInkCost(string $inkCost): DtgPriceInterface;
+	public function setInkCost(Money $inkCost): DtgPriceInterface;
 
 	/**
-	 * Returns the pre treatment cost in the smallest denominator of your currency
+	 * Returns the pre treatment cost as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getPreTreatmentCost(): string;
+	public function getPreTreatmentCost(): Money;
 
 	/**
-	 * Sets the pre treatment cost in the smalles denominator of your currency
+	 * Sets the pre treatment cost as money object
 	 *
-	 * @param string $preTreatment
+	 * @param Money $preTreatment
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setPreTreatmentCost(string $preTreatment): DtgPriceInterface;
+	public function setPreTreatmentCost(Money $preTreatment): DtgPriceInterface;
 
 	/**
-	 * Returns the labour cost in the smallest denominator of your currency
+	 * Returns the labour cost as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getLabourCost(): string;
+	public function getLabourCost(): Money;
 
 	/**
-	 * Sets the labour cost in the smalles denominator of your currency
+	 * Sets the labour cost as money object
 	 *
-	 * @param string $labourCost
+	 * @param Money $labourCost
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setLabourCost(string $labourCost): DtgPriceInterface;
+	public function setLabourCost(Money $labourCost): DtgPriceInterface;
 
 	/**
-	 * Returns the garment cost in the smallest denominator of your currency
+	 * Returns the garment cost as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getGarmentCost(): string;
+	public function getGarmentCost(): Money;
 
 	/**
-	 * Sets the garment cost in the smalles denominator of your currency
+	 * Sets the garment cost as money object
 	 *
-	 * @param string $garmentCost
+	 * @param Money $garmentCost
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setGarmentCost(string $garmentCost): DtgPriceInterface;
+	public function setGarmentCost(Money $garmentCost): DtgPriceInterface;
 
 	/**
-	 * Returns the price without profit in the smallest denominator of your currency
+	 * Returns the price without profit as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getPriceWithoutProfit(): string;
+	public function getPriceWithoutProfit(): Money;
 
 	/**
-	 * Sets the price without profit in the smalles denominator of your currency
+	 * Sets the price without profit as money object
 	 *
-	 * @param string $priceWithoutProfit
+	 * @param Money $priceWithoutProfit
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setPriceWithoutProfit(string $priceWithoutProfit): DtgPriceInterface;
+	public function setPriceWithoutProfit(Money $priceWithoutProfit): DtgPriceInterface;
 
 	/**
-	 * Returns the profit in the smallest denominator of your currency
+	 * Returns the profit as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getProfit(): string;
+	public function getProfit(): Money;
 
 	/**
-	 * Sets the profit in the smalles denominator of your currency
+	 * Sets the profit as money object
 	 *
-	 * @param string $profit
+	 * @param Money $profit
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setProfit(string $profit): DtgPriceInterface;
+	public function setProfit(Money $profit): DtgPriceInterface;
 
 	/**
-	 * Returns the total price in the smallest denominator of your currency
+	 * Returns the total price as money object
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	public function getTotalPrice(): string;
+	public function getTotalPrice(): Money;
 
 	/**
-	 * Sets the total price in the smalles denominator of your currency
+	 * Sets the total price as money object
 	 *
-	 * @param string $totalPrice
+	 * @param Money $totalPrice
 	 *
 	 * @return DtgPriceInterface
 	 */
-	public function setTotalPrice(string $totalPrice): DtgPriceInterface;
+	public function setTotalPrice(Money $totalPrice): DtgPriceInterface;
 }

@@ -12,7 +12,6 @@ interface DtgPriceCalculatorInterface {
 	 * @param float $colorInkUsage
 	 * @param float $whiteInkUsage
 	 * @param float $preTreatmentUsage
-	 * @param int $precision
 	 *
 	 * @return DtgPriceInterface
 	 */
@@ -20,15 +19,6 @@ interface DtgPriceCalculatorInterface {
 		GarmentConfigInterface $garmentConfig,
 		float $colorInkUsage,
 		float $whiteInkUsage,
-		float $preTreatmentUsage,
-		int $precision = self::PRICE_PRECISION
+		float $preTreatmentUsage
 	): DtgPriceInterface;
-
-	/**
-	 * @param int $precision
-	 * @param string[] ...$costs
-	 *
-	 * @return string
-	 */
-	public function sumCosts(int $precision, string ...$costs): string;
 }

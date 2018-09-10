@@ -4,59 +4,61 @@ declare(strict_types = 1);
 
 namespace Vaalyn\DtgPriceCalculator;
 
+use Money\Money;
+
 class DtgPrice implements DtgPriceInterface {
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $inkCost;
 
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $preTreatmentCost;
 
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $labourCost;
 
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $garmentCost;
 
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $priceWithoutProfit;
 
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $profit;
 
 	/**
-	 * @var string
+	 * @var Money
 	 */
 	protected $totalPrice;
 
 	/**
-	 * @param string $inkCost
-	 * @param string $preTreatmentCost
-	 * @param string $labourCost
-	 * @param string $garmentCost
-	 * @param string $priceWithoutProfit
-	 * @param string $profit
-	 * @param string $totalPrice
+	 * @param Money $inkCost
+	 * @param Money $preTreatmentCost
+	 * @param Money $labourCost
+	 * @param Money $garmentCost
+	 * @param Money $priceWithoutProfit
+	 * @param Money $profit
+	 * @param Money $totalPrice
 	 */
 	public function __construct(
-		string $inkCost,
-		string $preTreatmentCost,
-		string $labourCost,
-		string $garmentCost,
-		string $priceWithoutProfit,
-		string $profit,
-		string $totalPrice
+		Money $inkCost,
+		Money $preTreatmentCost,
+		Money $labourCost,
+		Money $garmentCost,
+		Money $priceWithoutProfit,
+		Money $profit,
+		Money $totalPrice
 	) {
 		$this->inkCost            = $inkCost;
 		$this->preTreatmentCost   = $preTreatmentCost;
@@ -70,14 +72,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getInkCost(): string {
+	public function getInkCost(): Money {
 		return $this->inkCost;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setInkCost(string $inkCost): DtgPriceInterface {
+	public function setInkCost(Money $inkCost): DtgPriceInterface {
 		$this->inkCost = $inkCost;
 
 		return $this;
@@ -86,14 +88,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getPreTreatmentCost(): string {
+	public function getPreTreatmentCost(): Money {
 		return $this->preTreatmentCost;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setPreTreatmentCost(string $preTreatment): DtgPriceInterface {
+	public function setPreTreatmentCost(Money $preTreatment): DtgPriceInterface {
 		$this->preTreatmentCost = $preTreatment;
 
 		return $this;
@@ -102,14 +104,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getLabourCost(): string {
+	public function getLabourCost(): Money {
 		return $this->labourCost;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setLabourCost(string $labourCost): DtgPriceInterface {
+	public function setLabourCost(Money $labourCost): DtgPriceInterface {
 		$this->labourCost = $labourCost;
 
 		return $this;
@@ -118,14 +120,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getGarmentCost(): string {
+	public function getGarmentCost(): Money {
 		return $this->garmentCost;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setGarmentCost(string $garmentCost): DtgPriceInterface {
+	public function setGarmentCost(Money $garmentCost): DtgPriceInterface {
 		$this->garmentCost = $garmentCost;
 
 		return $this;
@@ -134,14 +136,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getPriceWithoutProfit(): string {
+	public function getPriceWithoutProfit(): Money {
 		return $this->priceWithoutProfit;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setPriceWithoutProfit(string $priceWithoutProfit): DtgPriceInterface {
+	public function setPriceWithoutProfit(Money $priceWithoutProfit): DtgPriceInterface {
 		$this->priceWithoutProfit = $priceWithoutProfit;
 
 		return $this;
@@ -150,14 +152,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getProfit(): string {
+	public function getProfit(): Money {
 		return $this->profit;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setProfit(string $profit): DtgPriceInterface {
+	public function setProfit(Money $profit): DtgPriceInterface {
 		$this->profit = $profit;
 
 		return $this;
@@ -166,14 +168,14 @@ class DtgPrice implements DtgPriceInterface {
 	/**
 	 * @inheritDoc
 	 */
-	public function getTotalPrice(): string {
+	public function getTotalPrice(): Money {
 		return $this->totalPrice;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function setTotalPrice(string $totalPrice): DtgPriceInterface {
+	public function setTotalPrice(Money $totalPrice): DtgPriceInterface {
 		$this->totalPrice = $totalPrice;
 
 		return $this;

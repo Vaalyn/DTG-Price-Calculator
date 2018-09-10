@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Vaalyn\DtgPriceCalculator;
 
+use Money\Money;
+use Money\Currency;
 use Vaalyn\DtgPriceCalculator\Config\LabourConfigInterface;
 use Vaalyn\DtgPriceCalculator\Config\ProfitConfigInterface;
 use Vaalyn\DtgPriceCalculator\Config\GarmentConfigInterface;
@@ -11,8 +13,6 @@ use Vaalyn\DtgPriceCalculator\Config\InkCartridgeConfigInterface;
 use Vaalyn\DtgPriceCalculator\Config\PreTreatmentTankConfigInterface;
 
 class DtgPriceCalculator implements DtgPriceCalculatorInterface {
-	protected const PRICE_PRECISION = 3;
-
 	/**
 	 * @var InkCartridgeConfigInterface
 	 */
@@ -39,24 +39,32 @@ class DtgPriceCalculator implements DtgPriceCalculatorInterface {
 	protected $profitConfig;
 
 	/**
+	 * @var Currency
+	 */
+	protected $currency;
+
+	/**
 	 * @param InkCartridgeConfigInterface $colorCartridgeConfig
 	 * @param InkCartridgeConfigInterface $whiteCartridgeConfig
 	 * @param PreTreatmentTankConfigInterface $preTreatmentTankConfig
 	 * @param LabourConfigInterface $labourConfig
 	 * @param ProfitConfigInterface $profitConfig
+	 * @param string $currencyCode
 	 */
 	public function __construct(
 		InkCartridgeConfigInterface $colorCartridgeConfig,
 		InkCartridgeConfigInterface $whiteCartridgeConfig,
 		PreTreatmentTankConfigInterface $preTreatmentTankConfig,
 		LabourConfigInterface $labourConfig,
-		ProfitConfigInterface $profitConfig
+		ProfitConfigInterface $profitConfig,
+		string $currencyCode
 	) {
 		$this->colorCartridgeConfig   = $colorCartridgeConfig;
 		$this->whiteCartridgeConfig   = $whiteCartridgeConfig;
 		$this->preTreatmentTankConfig = $preTreatmentTankConfig;
 		$this->labourConfig           = $labourConfig;
 		$this->profitConfig           = $profitConfig;
+		$this->currency               = new Currency($currencyCode);
 	}
 
 	/**
@@ -66,29 +74,20 @@ class DtgPriceCalculator implements DtgPriceCalculatorInterface {
 		GarmentConfigInterface $garmentConfig,
 		float $colorInkUsage,
 		float $whiteInkUsage,
-		float $preTreatmentUsage,
-		int $precision = self::PRICE_PRECISION
+		float $preTreatmentUsage
 	): DtgPriceInterface {
-		$inkCost          = $this->calculateInkCostPerPrint($colorInkUsage, $whiteInkUsage, $precision);
-		$preTreatmentCost = $this->calculatePreTreatmentCostPerPrint($preTreatmentUsage, $precision);
-		$labourCost       = $this->calculateLabourCostPerPrint($precision);
-		$garmentCost      = (string) $garmentConfig->getPrice();
+		$inkCost          = $this->calculateInkCostPerPrint($colorInkUsage, $whiteInkUsage);
+		$preTreatmentCost = $this->calculatePreTreatmentCostPerPrint($preTreatmentUsage);
+		$labourCost       = $this->calculateLabourCostPerPrint();
+		$garmentCost      = new Money($garmentConfig->getPrice(), $this->currency);
 
-		$priceWithoutProfit = $this->sumCosts(
-			$precision,
-			$garmentCost,
-			$inkCost,
-			$preTreatmentCost,
-			$labourCost
-		);
+		$priceWithoutProfit = $inkCost->add($preTreatmentCost)
+			->add($labourCost)
+			->add($garmentCost);
 
-		$profit = $this->calculateProfitPerPrint($priceWithoutProfit, $precision);
+		$profit = $this->calculateProfitPerPrint($priceWithoutProfit);
 
-		$totalPrice = $this->sumCosts(
-			$precision,
-			$priceWithoutProfit,
-			$profit
-		);
+		$totalPrice = $priceWithoutProfit->add($profit);
 
 		return new DtgPrice(
 			$inkCost,
@@ -102,147 +101,115 @@ class DtgPriceCalculator implements DtgPriceCalculatorInterface {
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	public function sumCosts(int $precision, string ...$costs): string {
-		$totalCosts = '0';
-
-		foreach ($costs as $cost) {
-			$totalCosts = bcadd($totalCosts, $cost, $precision);
-		}
-
-		return $totalCosts;
-	}
-
-	/**
 	 * @param float $colorInkUsage
 	 * @param float $whiteInkUsage
-	 * @param int $precision
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculateInkCostPerPrint(
-		float $colorInkUsage,
-		float $whiteInkUsage,
-		int $precision
-	): string {
-		$colorPricePerMilliliter = $this->calculateColorPricePerMilliliter($precision);
-		$whitePricePerMilliliter = $this->calculateWhitePricePerMilliliter($precision);
+	protected function calculateInkCostPerPrint(float $colorInkUsage, float $whiteInkUsage): Money {
+		$colorPricePerMilliliter = $this->calculateColorPricePerMilliliter();
+		$whitePricePerMilliliter = $this->calculateWhitePricePerMilliliter();
 
-		$colorPrice = bcmul($colorPricePerMilliliter, (string) $colorInkUsage, $precision);
-		$whitePrice = bcmul($whitePricePerMilliliter, (string) $whiteInkUsage, $precision);
+		$colorPrice = $colorPricePerMilliliter->multiply($colorInkUsage);
+		$whitePrice = $whitePricePerMilliliter->multiply($whiteInkUsage);
 
-		return bcadd($colorPrice, $whitePrice, $precision);
+		return $colorPrice->add($whitePrice);
 	}
 
 	/**
 	 * @param float $preTreatmentUsage
-	 * @param int $precision
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculatePreTreatmentCostPerPrint(float $preTreatmentUsage,  int $precision): string {
-		$preTreatmentPricePerMilliliter = $this->calculatePreTreatmentPricePerMilliliter($precision);
+	protected function calculatePreTreatmentCostPerPrint(float $preTreatmentUsage): Money {
+		$preTreatmentPricePerMilliliter = $this->calculatePreTreatmentPricePerMilliliter();
 
-		return bcmul($preTreatmentPricePerMilliliter, (string) $preTreatmentUsage, $precision);
+		return $preTreatmentPricePerMilliliter->multiply($preTreatmentUsage);
 	}
 
 	/**
-	 * @param int $precision
-	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculateColorPricePerMilliliter(int $precision): string {
+	protected function calculateColorPricePerMilliliter(): Money {
 		return $this->calculatePricePerMilliliter(
 			$this->colorCartridgeConfig->getCartridgePrice(),
-			$this->colorCartridgeConfig->getCartridgeCapacity(),
-			$precision
+			$this->colorCartridgeConfig->getCartridgeCapacity()
 		);
 	}
 
 	/**
-	 * @param int $precision
-	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculateWhitePricePerMilliliter(int $precision): string {
+	protected function calculateWhitePricePerMilliliter(): Money {
 		return $this->calculatePricePerMilliliter(
 			$this->whiteCartridgeConfig->getCartridgePrice(),
-			$this->whiteCartridgeConfig->getCartridgeCapacity(),
-			$precision
+			$this->whiteCartridgeConfig->getCartridgeCapacity()
 		);
 	}
 
 	/**
-	 * @param int $precision
-	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculatePreTreatmentPricePerMilliliter(int $precision): string {
+	protected function calculatePreTreatmentPricePerMilliliter(): Money {
 		return $this->calculatePricePerMilliliter(
 			$this->preTreatmentTankConfig->getTankPrice(),
-			$this->preTreatmentTankConfig->getTankCapacity(),
-			$precision
+			$this->preTreatmentTankConfig->getTankCapacity()
 		);
 	}
 
 	/**
-	 * @param int $precision
-	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculateLabourCostPerPrint(int $precision): string {
-		return bcmul(
-			$this->calculateLabourCostPerMinute($precision),
-			(string) $this->labourConfig->getLabourTimePerPrint(),
-			$precision
+	protected function calculateLabourCostPerPrint(): Money {
+		$labourCostPerMinute = $this->calculateLabourCostPerMinute();
+
+		return $labourCostPerMinute->multiply(
+			$this->labourConfig->getLabourTimePerPrint()
 		);
 	}
 
 	/**
 	 * @param int $totalPrice
 	 * @param int $capacity
-	 * @param int $precision
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculatePricePerMilliliter(int $totalPrice, int $capacity, int $precision): string {
-		return bcdiv(
-			(string) $totalPrice,
-			(string) $capacity,
-			$precision
-		);
+	protected function calculatePricePerMilliliter(int $totalPrice, int $capacity): Money {
+		$money = new Money($totalPrice,  $this->currency);
+
+		return $money->divide($capacity);
 	}
 
 	/**
-	 * @param int $precision
-	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculateLabourCostPerMinute(int $precision): string {
+	protected function calculateLabourCostPerMinute(): Money {
 		$minutesPerHour = '60';
 
-		return bcdiv(
-			(string) $this->labourConfig->getHourlyCost(),
-			$minutesPerHour,
-			$precision
+		$labourHourlyCost = new Money(
+			$this->labourConfig->getHourlyCost(),
+			$this->currency
 		);
+
+		return $labourHourlyCost->divide($minutesPerHour);
 	}
 
 	/**
-	 * @param string $priceWithoutProfit
-	 * @param int $precision
+	 * @param Money $priceWithoutProfit
 	 *
-	 * @return string
+	 * @return Money
 	 */
-	protected function calculateProfitPerPrint(string $priceWithoutProfit, int $precision): string {
+	protected function calculateProfitPerPrint(Money $priceWithoutProfit): Money {
 		if (!$this->profitConfig->isPercentageValue()) {
-			return (string) $this->profitConfig->getValue();
+			return new Money(
+				$this->profitConfig->getValue(),
+				$this->currency
+			);
 		}
 
-		return bcmul(
-			bcdiv($priceWithoutProfit, '100'),
-			(string) $this->profitConfig->getValue()
-		);
+		return $priceWithoutProfit->divide(100)
+			->multiply(
+				$this->profitConfig->getValue()
+			);
 	}
 }
