@@ -1,5 +1,8 @@
 {
     "name": "vaalyn/dtg-price-calculator",
+	"description": "A small library to easily calculate the price for a single direct-to-garment print.",
+	"keywords": ["dtg", "direct-to-garment", "calculator", "price", "printing"],
+	"homepage": "https://github.com/Vaalyn/dtg-price-calculator",
     "type": "library",
 	"license": "Apache-2.0",
     "authors": [
@@ -14,6 +17,7 @@
 		}
 	},
     "require": {
+		"php": ">=7.2.0",
         "moneyphp/money": "^3.1"
     }
 }
